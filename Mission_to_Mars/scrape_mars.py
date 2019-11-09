@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[6]:
+# In[1]:
 
 
 # dependencies
@@ -12,7 +12,7 @@ from splinter import Browser
 from bs4 import BeautifulSoup
 
 
-# In[7]:
+# In[2]:
 
 
 # chromedriver path
@@ -458,7 +458,7 @@ executable_path = {"executable_path": "chromedriver.exe"}
 browser = Browser("chrome", **executable_path, headless=False)
 
 
-# In[24]:
+# In[3]:
 
 
 ### mars hemispheres ### method 2
@@ -467,27 +467,27 @@ browser.visit(usgs_url)
 usgs_html = browser.html
 
 
-# In[25]:
+# In[4]:
 
 
 usgs_soup = BeautifulSoup(usgs_html, "html.parser")
 usgs_soup.body
 
 
-# In[26]:
+# In[5]:
 
 
 mars_hemisphere_name = usgs_soup.find_all("div", class_="description")
 mars_hemisphere_name
 
 
-# In[27]:
+# In[6]:
 
 
 featured_image_urls = []
 
 
-# In[29]:
+# In[7]:
 
 
 for name in mars_hemisphere_name:
@@ -517,6 +517,12 @@ print(featured_image_urls)
 
 
 # In[ ]:
+
+
+browser.quit()
+
+
+# In[30]:
 
 
 ### convert jupyter notebook into python script called 'scrape_mars.py'
