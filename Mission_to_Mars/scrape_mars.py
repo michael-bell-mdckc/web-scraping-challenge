@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[27]:
 
 
 # dependencies
@@ -11,41 +11,44 @@ import requests
 import time
 from splinter import Browser
 from bs4 import BeautifulSoup
+
 time.sleep(5)
 
-# In[2]:
+
+# In[28]:
+
+
+# chromedriver path
+def init_browser():
+    executable_path = {"executable_path": "chromedriver.exe"}
+    return Browser("chrome", **executable_path, headless=False)
+
+# In[29]:
 
 
 def scrape_info():
-    # chromedriver path
-    executable_path = {"executable_path": "chromedriver.exe"}
-    browser = Browser("chrome", **executable_path, headless=False)
+    browser = init_browser()
     time.sleep(5)
-
-    # In[3]:
-
     ### nasa mars news ###
     nasa_mars_news_url = "https://mars.nasa.gov/news/"
     nasa_mars_news_html = requests.get(nasa_mars_news_url)
 
-    # In[4]:
+    # In[30]:
 
     nasa_mars_news_soup = BeautifulSoup(
         nasa_mars_news_html.text, "html.parser")
 
-    # In[5]:
+    # In[31]:
 
     nasa_mars_news_title = nasa_mars_news_soup.find(
-        "div", class_="content_title").text
-    print(f"Latest News Title: {nasa_mars_news_title}")
+        "div", class_="content_title").text.replace("\n", "")
 
-    # In[6]:
+    # In[32]:
 
     nasa_mars_news_paragraph = nasa_mars_news_soup.find(
-        "div", class_="rollover_description_inner").text
-    print(f"Paragraph Text: {nasa_mars_news_paragraph}")
+        "div", class_="rollover_description_inner").text.replace("\n", "")
 
-    # In[7]:
+    # In[33]:
 
     ### jpl mars space images ###
     jpl_mars_images_url = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
@@ -53,75 +56,72 @@ def scrape_info():
     jpl_mars_images_html = browser.html
     time.sleep(5)
 
-    # In[8]:
+    # In[34]:
 
     jpl_mars_images_soup = BeautifulSoup(jpl_mars_images_html, "html.parser")
 
-    # In[9]:
+    # In[35]:
 
     browser.click_link_by_partial_text("FULL IMAGE")
     time.sleep(5)
 
-    # In[10]:
+    # In[36]:
 
     browser.click_link_by_partial_text("more info")
     time.sleep(5)
 
-    # In[11]:
+    # In[37]:
 
     jpl_mars_images_html = browser.html
 
-    # In[12]:
+    # In[38]:
 
     jpl_mars_images_soup = BeautifulSoup(jpl_mars_images_html, "html.parser")
 
-    # In[13]:
+    # In[39]:
 
     image_url = jpl_mars_images_soup.find("img", class_='main_image')
     image_url = image_url.get("src")
-    print("Image URL:", image_url)
 
-    # In[14]:
+    # In[40]:
 
     featured_image_url = "https://www.jpl.nasa.gov" + image_url
-    print("Featured Image URL:", featured_image_url)
 
-    # In[15]:
+    # In[41]:
 
     ### mars weather ###
     twitter_mars_weather_url = "https://twitter.com/marswxreport?lang=en"
     twitter_mars_weather_html = requests.get(twitter_mars_weather_url)
 
-    # In[16]:
+    # In[42]:
 
     twitter_mars_weather_soup = BeautifulSoup(
         twitter_mars_weather_html.text, "html.parser")
     time.sleep(5)
 
-    # In[17]:
+    # In[44]:
 
     mars_weather = twitter_mars_weather_soup.find(
         "p", class_="TweetTextSize TweetTextSize--normal js-tweet-text tweet-text").text
-    print("Mars Weather:", mars_weather)
 
-    # In[18]:
+    # In[45]:
 
     ### mars facts ###
     mars_facts_url = "https://space-facts.com/mars/"
-    mars_facts_html = requests.get(mars_facts_url)
-    time.sleep(5)
+    mars_facts_tables = pd.read_html(mars_facts_url)
 
-    # In[19]:
+    # In[46]:
 
-    mars_facts_soup = BeautifulSoup(mars_facts_html.text, "html.parser")
+    mars_facts_tables = mars_facts_tables[0]
 
-    # In[20]:
+    # In[47]:
 
-    mars_facts = mars_facts_soup.find(
-        "table", class_="tablepress tablepress-id-p-mars")
-    print(mars_facts)
+    mars_facts_tables.columns = ["Property", "Value"]
+    mars_facts_tables.set_index("Property", inplace=True)
+    mars_facts = mars_facts_tables.to_html()
+    mars_facts = mars_facts.replace("\n", "")
 
-    # In[21]:
+    # In[52]:
 
     # mars hemispheres ### method 1
     usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
@@ -129,227 +129,227 @@ def scrape_info():
     usgs_html = browser.html
     time.sleep(5)
 
-    # In[22]:
-
-    usgs_soup = BeautifulSoup(usgs_html, "html.parser")
-
-    # In[23]:
-
-    mars_hemisphere_name = usgs_soup.find_all("h3")
-
-    # In[24]:
-
-    browser.click_link_by_partial_text('Cerberus Hemisphere Enhanced')
-    time.sleep(5)
-
-    # In[25]:
-
-    browser.click_link_by_partial_text('Open')
-
-    # In[26]:
-
-    usgs_html_1 = browser.html
-
-    # In[27]:
-
-    usgs_soup_1 = BeautifulSoup(usgs_html_1, "html.parser")
-
-    # In[28]:
-
-    image_url_1 = usgs_soup_1.find("img", class_='wide-image')
-    image_url_1 = image_url_1.get("src")
-    print("Image URL:", image_url_1)
-
-    # In[29]:
-
-    featured_image_url_1 = "https://astrogeology.usgs.gov" + image_url_1
-    print("Featured Image URL:", featured_image_url_1)
-
-    # In[30]:
-
-    usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
-    browser.visit(usgs_url)
-    usgs_html = browser.html
-    time.sleep(5)
-
-    # In[31]:
-
-    usgs_soup = BeautifulSoup(usgs_html, "html.parser")
-
-    # In[32]:
-
-    browser.click_link_by_partial_text('Schiaparelli Hemisphere Enhanced')
-    time.sleep(5)
-
-    # In[33]:
-
-    browser.click_link_by_partial_text('Open')
-
-    # In[34]:
-
-    usgs_html_2 = browser.html
-
-    # In[35]:
-
-    usgs_soup_2 = BeautifulSoup(usgs_html_2, "html.parser")
-
-    # In[36]:
-
-    image_url_2 = usgs_soup_2.find("img", class_='wide-image')
-    image_url_2 = image_url_2.get("src")
-    print("Image URL:", image_url_2)
-
-    # In[37]:
-
-    featured_image_url_2 = "https://astrogeology.usgs.gov" + image_url_2
-    print("Featured Image URL:", featured_image_url_2)
-
-    # In[38]:
-
-    usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
-    browser.visit(usgs_url)
-    usgs_html = browser.html
-    time.sleep(5)
-
-    # In[39]:
-
-    usgs_soup = BeautifulSoup(usgs_html, "html.parser")
-
-    # In[40]:
-
-    browser.click_link_by_partial_text('Syrtis Major Hemisphere Enhanced')
-    time.sleep(5)
-
-    # In[41]:
-
-    browser.click_link_by_partial_text('Open')
-
-    # In[42]:
-
-    usgs_html_3 = browser.html
-
-    # In[43]:
-
-    usgs_soup_3 = BeautifulSoup(usgs_html_3, "html.parser")
-
-    # In[44]:
-
-    image_url_3 = usgs_soup_3.find("img", class_='wide-image')
-    image_url_3 = image_url_3.get("src")
-    print("Image URL:", image_url_3)
-
-    # In[45]:
-
-    featured_image_url_3 = "https://astrogeology.usgs.gov" + image_url_3
-    print("Featured Image URL:", featured_image_url_3)
-
-    # In[46]:
-
-    usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
-    browser.visit(usgs_url)
-    usgs_html = browser.html
-    time.sleep(5)
-
-    # In[47]:
-
-    usgs_soup = BeautifulSoup(usgs_html, "html.parser")
-
-    # In[48]:
-
-    browser.click_link_by_partial_text('Valles Marineris Hemisphere Enhanced')
-    time.sleep(5)
-
-    # In[51]:
-
-    browser.click_link_by_partial_text('Open')
-
-    # In[52]:
-
-    usgs_html_4 = browser.html
-
     # In[53]:
 
-    usgs_soup_4 = BeautifulSoup(usgs_html_4, "html.parser")
-
-    # In[54]:
-
-    image_url_4 = usgs_soup_4.find("img", class_='wide-image')
-    image_url_4 = image_url_4.get("src")
-    print("Image URL:", image_url_4)
-    time.sleep(5)
-
-    # In[55]:
-
-    featured_image_url_4 = "https://astrogeology.usgs.gov" + image_url_4
-    print("Featured Image URL:", featured_image_url_4)
+    # usgs_soup = BeautifulSoup(usgs_html, "html.parser")
 
     # In[56]:
 
-    # mars hemispheres ### method 2
-    usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
-    browser.visit(usgs_url)
-    usgs_html = browser.html
+    # mars_hemisphere_name = usgs_soup.find_all("h3")
 
     # In[57]:
 
-    usgs_soup = BeautifulSoup(usgs_html, "html.parser")
-    usgs_soup.body
+    text_1 = "Cerberus Hemisphere Enhanced"
+    browser.click_link_by_partial_text(text_1)
+    time.sleep(5)
 
     # In[58]:
 
-    mars_hemisphere_name = usgs_soup.find_all("div", class_="description")
-    mars_hemisphere_name
-    time.sleep(5)
+    browser.click_link_by_partial_text("Open")
 
     # In[59]:
 
-    featured_image_urls = []
+    usgs_html_1 = browser.html
 
     # In[60]:
 
-    for name in mars_hemisphere_name:
-        featured_image_url = name.find("a", class_="itemLink product-item")
-        print(featured_image_url)
-        hemisphere = featured_image_url.get("href")
-        hemisphere_url = "https://astrogeology.usgs.gov" + hemisphere
-        print(hemisphere_url)
-
-        browser.visit(hemisphere_url)
-
-        hemisphere_url_dict = {}
-
-        usgs_html = browser.html
-        usgs_soup = BeautifulSoup(usgs_html, "html.parser")
-
-        hemisphere_url = usgs_soup.find("a", text="Original")
-        hemisphere_url = hemisphere_url.get("href")
-
-        hemisphere_name = usgs_soup.find(
-            "h2", class_="title").text.replace(" Enhanced", "")
-
-        hemisphere_url_dict["title"] = hemisphere_name
-        hemisphere_url_dict["img_url"] = hemisphere_url
-
-        featured_image_urls.append(hemisphere_url_dict)
-
-    print(featured_image_urls)
-
-    marsData = {"News Title": nasa_mars_news_title,
-                "News Paragraph": nasa_mars_news_paragraph,
-                "JPL Image URL": featured_image_url,
-                "Twitter Weather": mars_weather,
-                "Facts Table": mars_facts
-                }
+    usgs_soup_1 = BeautifulSoup(usgs_html_1, "html.parser")
 
     # In[61]:
+
+    image_url_1 = usgs_soup_1.find("img", class_='wide-image')
+    image_url_1 = image_url_1.get("src")
+
+    # In[62]:
+
+    featured_image_url_1 = "https://astrogeology.usgs.gov" + image_url_1
+
+    # In[63]:
+
+    usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
+    browser.visit(usgs_url)
+    usgs_html = browser.html
+    time.sleep(5)
+
+    # In[64]:
+
+    # usgs_soup = BeautifulSoup(usgs_html, "html.parser")
+
+    # In[65]:
+
+    text_2 = "Schiaparelli Hemisphere Enhanced"
+    browser.click_link_by_partial_text(text_2)
+    time.sleep(5)
+
+    # In[66]:
+
+    browser.click_link_by_partial_text("Open")
+
+    # In[67]:
+
+    usgs_html_2 = browser.html
+
+    # In[68]:
+
+    usgs_soup_2 = BeautifulSoup(usgs_html_2, "html.parser")
+
+    # In[69]:
+
+    image_url_2 = usgs_soup_2.find("img", class_='wide-image')
+    image_url_2 = image_url_2.get("src")
+
+    # In[70]:
+
+    featured_image_url_2 = "https://astrogeology.usgs.gov" + image_url_2
+
+    # In[71]:
+
+    usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
+    browser.visit(usgs_url)
+    usgs_html = browser.html
+    time.sleep(5)
+
+    # In[72]:
+
+    # usgs_soup = BeautifulSoup(usgs_html, "html.parser")
+
+    # In[73]:
+
+    text_3 = "Syrtis Major Hemisphere Enhanced"
+    browser.click_link_by_partial_text(text_3)
+    time.sleep(5)
+
+    # In[74]:
+
+    browser.click_link_by_partial_text("Open")
+
+    # In[75]:
+
+    usgs_html_3 = browser.html
+
+    # In[76]:
+
+    usgs_soup_3 = BeautifulSoup(usgs_html_3, "html.parser")
+
+    # In[77]:
+
+    image_url_3 = usgs_soup_3.find("img", class_='wide-image')
+    image_url_3 = image_url_3.get("src")
+
+    # In[78]:
+
+    featured_image_url_3 = "https://astrogeology.usgs.gov" + image_url_3
+
+    # In[79]:
+
+    usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
+    browser.visit(usgs_url)
+    usgs_html = browser.html
+    time.sleep(5)
+
+    # In[80]:
+
+    # usgs_soup = BeautifulSoup(usgs_html, "html.parser")
+
+    # In[81]:
+
+    text_4 = "Valles Marineris Hemisphere Enhanced"
+    browser.click_link_by_partial_text(text_4)
+    time.sleep(5)
+
+    # In[82]:
+
+    browser.click_link_by_partial_text("Open")
+
+    # In[83]:
+
+    usgs_html_4 = browser.html
+
+    # In[84]:
+
+    usgs_soup_4 = BeautifulSoup(usgs_html_4, "html.parser")
+
+    # In[85]:
+
+    image_url_4 = usgs_soup_4.find("img", class_='wide-image')
+    image_url_4 = image_url_4.get("src")
+
+    # In[86]:
+
+    featured_image_url_4 = "https://astrogeology.usgs.gov" + image_url_4
+
+    # In[87]:
+
+    # mars hemispheres ### method 2
+    # usgs_url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
+    # browser.visit(usgs_url)
+    # usgs_html = browser.html
+
+    # In[88]:
+
+    # usgs_soup = BeautifulSoup(usgs_html, "html.parser")
+    # usgs_soup.body
+
+    # In[89]:
+
+    # mars_hemisphere_name = usgs_soup.find_all("div", class_="description")
+    # mars_hemisphere_name
+
+    # In[90]:
+
+    # featured_image_urls = []
+
+    # In[91]:
+
+    # for name in mars_hemisphere_name:
+    #     featured_image_url = name.find("a", class_="itemLink product-item")
+    #     hemisphere = featured_image_url.get("href")
+    #     hemisphere_url = "https://astrogeology.usgs.gov" + hemisphere
+    #     print(hemisphere_url)
+
+    #     browser.visit(hemisphere_url)
+
+    #     hemisphere_url_dict = {}
+
+    #     usgs_html = browser.html
+    #     usgs_soup = BeautifulSoup(usgs_html, "html.parser")
+
+    #     hemisphere_url = usgs_soup.find("a", text="Original")
+    #     hemisphere_url = hemisphere_url.get("href")
+
+    #     hemisphere_name = usgs_soup.find("h2", class_="title").text.replace(" Enhanced", "")
+
+    #     hemisphere_url_dict["title"] = hemisphere_name
+    #     hemisphere_url_dict["img_url"] = hemisphere_url
+
+    #     featured_image_urls.append(hemisphere_url_dict)
+
+    # print(featured_image_urls)
+
+    marsData = {"News_Title": nasa_mars_news_title,
+                "News_Paragraph": nasa_mars_news_paragraph,
+                "JPL_Image_URL": featured_image_url,
+                "Twitter_Weather": mars_weather,
+                "Facts_Table": mars_facts,
+                "Hemisphere_1": text_1,
+                "Hemisphere_URL_1": featured_image_url_1,
+                "Hemisphere_2": text_2,
+                "Hemisphere_URL_2": featured_image_url_2,
+                "Hemisphere_3": text_3,
+                "Hemisphere_URL_3": featured_image_url_3,
+                "Hemisphere_4": text_4,
+                "Hemisphere_URL_4": featured_image_url_4
+                }
+
+    # In[92]:
 
     browser.quit()
     time.sleep(5)
 
-    # In[62]:
+    return marsData
+
+    # In[87]:
 
     # convert jupyter notebook into python script called 'scrape_mars.py'
     # get_ipython().system(
     #     ' jupyter nbconvert --to script --template basic mission_to_mars.ipynb --output scrape_mars')
-
-    return marsData

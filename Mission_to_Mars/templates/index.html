@@ -11,37 +11,79 @@
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <title>mission-to-mars</title>
-
   </head>
 
   <body>
     <div class="container">
 
       <div class="jumbotron text-center">
-        <h1>Mission to Mars</h1>
+        <h1><strong>Mission to Mars</strong></h1>
         <p><a class="btn btn-primary btn-lg" href="/scrape" role="button">Scrape New Data</a></p>
       </div>
 
       <!-- Mission to Mars Data -->
       <div class="row">
         <div class="col-md-12">
-          <h4 class="heading">{{mission_to_mars.nasa_mars_news_title}}</h4>
-          <small>{{mission_to_mars.nasa_mars_news_paragraph}}</small>
-          <small>{{mission_to_mars.featured_image_url}}</small>
-          <small>{{mission_to_mars.mars_weather}}</small>
-          <small>{{mission_to_mars.mars_facts}}</small>
+          <h4 class="heading"><strong>Latest Mars News</strong></h4>
+          <h5>{{mars.News_Title}}</h5>
+          <h6>{{mars.News_Paragraph}}</h6>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-md-8">
+          <h4 class="heading"><strong>Featured Mars Image</strong></h4>
+          <img class="img-thumbnail img-fluid" src={{mars.JPL_Image_URL}} alt="Featured Mars Image">
+        </div>
+        <div class="col-md-4">
+          <h4 class="heading"><strong>Current Weather on Mars</strong></h4>
+          <div class="container">
+            {{mars.Twitter_Weather}}
+          </div>
+          <hr>
+          <h4 class="heading"><strong>Mars Facts</strong></h4>
+          {{mars.Facts_Table | safe}}
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-md-12" id="box_background">
+          <h4 class="heading"><strong>Mars Hemispheres</strong></h4>
+          <p>
+            Hover over any hemisphere to see its name.
+          </p>
+          <div class="row">
+            <div class="col-md-6 col-xs-12">
+              <a href="#" data-toggle="tooltip" title="{{mars.Hemisphere_1}}"><img class="img-thumbnail img-fluid"
+                  src={{mars.Hemisphere_URL_1}} alt={{mars.Hemisphere_1}}></a>
+            </div>
+            <div class="col-md-6 col-xs-12">
+              <a href="#" data-toggle="tooltip" title="{{mars.Hemisphere_2}}"><img class="img-thumbnail img-fluid"
+                  src={{mars.Hemisphere_URL_2}} alt={{mars.Hemisphere_2}}></a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 col-xs-12">
+              <a href="#" data-toggle="tooltip" title="{{mars.Hemisphere_3}}"><img class="img-thumbnail img-fluid"
+                  src={{mars.Hemisphere_URL_3}} alt={{mars.Hemisphere_3}}></a>
+            </div>
+            <div class="col-md-6 col-xs-12">
+              <a href="#" data-toggle="tooltip" title="{{mars.Hemisphere_4}}"><img class="img-thumbnail img-fluid"
+                  src={{mars.Hemisphere_URL_4}} alt={{mars.Hemisphere_4}}></a>
+            </div>
+          </div>
         </div>
       </div>
 
-    </div>
 
-    <!-- Footer -->
-    <div class="row">
-      <div id="foot" class="col-md-12">
-        <hr>
-        <article>
-          <section>part1</section>
-        </article>
+      <!-- Footer -->
+      <div class="row">
+        <div id="foot" class="col-md-12">
+          <hr>
+          <article>
+            <section>Mission to Mars</section>
+          </article>
+        </div>
       </div>
     </div>
 
